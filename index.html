@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Paddy | Research Portfolio</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1B5E20',   // Forest Green
+                        secondary: '#66BB6A', // Leaf Green
+                        accent: '#8D6E63',    // Terracotta/Soil Brown
+                        background: '#FAF8F5' // Off-White/Cream
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FAF8F5;
+            color: #333;
+        }
+        
+        .blob-shape {
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            animation: morph 8s ease-in-out infinite;
+        }
+
+        @keyframes morph {
+            0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+            34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+            67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+        }
+
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            max-width: 90vw;
+            color: #000;
+            background: rgba(255, 255, 255, 0.35);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            padding: 16px 20px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s, visibility 0.5s, bottom 0.5s;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
+        #toast-message { color: #000; }
+
+        [id] { scroll-margin-top: 5.5rem; }
+
+        /* Shared header / footer look */
+        .site-bar {
+            background: linear-gradient(135deg, #123f16 0%, #1B5E20 55%, #2E7D32 100%);
+            color: #fff;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85);
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: background-color .2s, color .2s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.14); color: #fff; }
+        .nav-cta {
+            background: #66BB6A;
+            color: #0e3311;
+            font-weight: 700;
+            padding: 0.55rem 1.25rem;
+            border-radius: 999px;
+            transition: background-color .2s, transform .2s;
+        }
+        .nav-cta:hover { background: #fff; transform: translateY(-1px); }
+        #navbar.scrolled { box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+        .footer-link { color: rgba(255,255,255,0.75); transition: color .2s; }
+        .footer-link:hover { color: #A5D6A7; }
+        .tech-chip {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Supervisor + team cards (shared colors) */
+        .person-card {
+            background: linear-gradient(180deg, #ffffff 0%, #EEF6EF 100%);
+            border: 1px solid rgba(27,94,32,0.15);
+            border-top: 4px solid #1B5E20;
+            border-radius: 1.5rem;
+            box-shadow: 0 2px 8px rgba(27,94,32,0.08);
+            transition: transform .3s, box-shadow .3s, border-color .3s;
+        }
+        .person-card:hover {
+            transform: translateY(-6px);
+            border-top-color: #66BB6A;
+            box-shadow: 0 16px 32px rgba(27,94,32,0.18);
+        }
+        .person-avatar {
+            box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(102,187,106,0.6), 0 8px 18px rgba(0,0,0,0.12);
+            transition: box-shadow .3s;
+        }
+        .person-card:hover .person-avatar {
+            box-shadow: 0 0 0 4px #fff, 0 0 0 7px #1B5E20, 0 8px 18px rgba(0,0,0,0.15);
+        }
+        .role-pill {
+            display: inline-block;
+            background: rgba(27,94,32,0.08);
+            color: #1B5E20;
+            border: 1px solid rgba(27,94,32,0.22);
+            padding: 0.2rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-secondary selection:text-white">
+
+    <nav id="navbar" class="site-bar fixed w-full z-50 top-0 transition-shadow duration-300 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="#hero" class="flex items-center gap-3">
+                    <img src="https://ui-avatars.com/api/?name=DP&background=66BB6A&color=0e3311&rounded=true&size=128" alt="Digital Paddy Logo" class="w-11 h-11 object-contain rounded-full ring-2 ring-white/40">
+                    <span class="leading-tight">
+                        <span class="block font-extrabold text-xl text-white tracking-tight">The Digital Paddy</span>
+                        <span class="block text-xs font-semibold tracking-widest uppercase text-secondary">Research Portfolio</span>
+                    </span>
+                </a>
+
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="#hero" class="nav-link">Home</a>
+                    <a href="#context" class="nav-link">Context</a>
+                    <a href="#supervisors" class="nav-link">Supervisors</a>
+                    <a href="#team" class="nav-link">Team</a>
+                    <a href="#documents" class="nav-cta ml-3">Documents</a>
+                </div>
+
+                <button id="menu-btn" type="button" aria-label="Toggle menu" aria-expanded="false" class="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors">
+                    <svg id="icon-open" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    <svg id="icon-close" class="hidden" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden border-t border-white/10 px-4 pb-5 pt-3 space-y-1">
+            <a href="#hero" class="nav-link block">Home</a>
+            <a href="#context" class="nav-link block">Context</a>
+            <a href="#supervisors" class="nav-link block">Supervisors</a>
+            <a href="#team" class="nav-link block">Team</a>
+            <a href="#documents" class="nav-cta block text-center mt-3">Documents</a>
+        </div>
+    </nav>
+
+    <!-- Updated Hero Section with Background Image -->
+    <section
+    id="hero"
+    class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden"
+    style="background-color: #e8efe5; background-image: linear-gradient(rgba(250, 248, 245, 0.62), rgba(250, 248, 245, 0.82)), url('./images/background1.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;"
+    >
+        <div class="absolute top-20 -left-20 w-96 h-96 bg-secondary/20 blob-shape -z-10 blur-3xl"></div>
+        <div class="absolute bottom-20 -right-20 w-96 h-96 bg-primary/10 blob-shape -z-10 blur-3xl" style="animation-delay: 2s;"></div>
+
+        <div class="max-w-4xl mx-auto px-4 text-center z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-primary font-bold text-sm mb-8 border border-primary/20 shadow-sm">
+                <i data-feather="award" class="w-4 h-4 text-secondary"></i>
+                Final Year Research Project 2026
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold text-primary tracking-tight leading-tight mb-6 drop-shadow-sm">
+                The Digital Paddy
+            </h1>
+            <h2 class="text-2xl md:text-3xl font-semibold text-accent mb-8">
+                AI-Based Pest Detection & Early Warning System
+            </h2>
+            
+            <p class="text-lg md:text-xl text-gray-800 font-medium mb-12 max-w-3xl mx-auto leading-relaxed">
+                Bridging advanced <strong class="text-primary">Artificial Intelligence</strong> with Sri Lankan agriculture. 
+                Utilizing <strong class="text-accent">YOLOv8</strong> edge-computing, IoT camera traps, and predictive weather modeling to safeguard local rice yields.
+            </p>
+            
+            <a href="#documents" class="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-secondary transition-all duration-300 shadow-[0_4px_14px_0_rgba(27,94,32,0.39)] hover:shadow-[0_6px_20px_rgba(102,187,106,0.23)] hover:-translate-y-1">
+                Explore Portfolio Documents
+                <i data-feather="arrow-down" class="animate-bounce"></i>
+            </a>
+        </div>
+    </section>
+
+    <section id="context" class="relative py-24 px-4" style="background-color: #e8efe5; background-image: linear-gradient(rgba(250, 248, 245, 0.62), rgba(250, 248, 245, 0.82)), url('./images/background1.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
+        <div class="max-w-7xl mx-auto">
+            
+            <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-primary mb-6 flex items-center gap-4">
+                        <span class="p-3 bg-background rounded-lg border border-accent/20"><i data-feather="target" class="text-accent"></i></span>
+                        The Problem & Vision
+                    </h2>
+                    <div class="w-20 h-1 bg-secondary rounded-full mb-8"></div>
+                    
+                    <!-- Updated Vision text tailored to the actual research -->
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        Rice crops across regions like Ampara are highly vulnerable to localized pests and diseases, often leading to devastating yield losses before farmers can visually detect the threat. Traditional monitoring is labor-intensive, subjective, and strictly reactive.
+                    </p>
+
+                    <p class="text-gray-700 leading-relaxed text-lg">
+                        <strong class="text-primary">The Digital Paddy</strong> proposes a proactive, real-time monitoring ecosystem. Validated alongside agricultural experts at the <strong class="text-accent"> Rice Research and Development Institute (RRDI), Batalagoda And Rice Research Station in Sammanthurai</strong>, we deploy field-level IoT camera traps alongside high-resolution edge computing. By running optimized <strong class="text-secondary">YOLOv8 object detection</strong> models integrated with local weather data APIs, we provide farming communities with an intelligent, highly accurate early warning system.
+                    </p>
+                </div>
+                
+                <div class="bg-background p-8 md:p-10 rounded-3xl border border-accent/20 shadow-sm relative overflow-hidden group hover:border-secondary/50 transition-colors duration-500">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-secondary/10 rounded-full blur-2xl group-hover:bg-secondary/20 transition-all duration-500"></div>
+                    <h3 class="text-2xl font-bold text-primary mb-8">Core Technologies</h3>
+                    
+                    <ul class="space-y-6 relative z-10">
+                        <li class="flex items-start gap-5">
+                            <div class="p-3 bg-white rounded-xl shadow-sm border border-accent/10 text-primary"><i data-feather="box"></i></div>
+                            <div>
+                                <h4 class="font-bold text-lg text-primary mb-1">YOLOv8 Edge AI</h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">High-speed, accurate pest classification from camera traps directly on localized edge devices, minimizing latency.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-5">
+                            <div class="p-3 bg-white rounded-xl shadow-sm border border-accent/10 text-secondary"><i data-feather="camera"></i></div>
+                            <div>
+                                <h4 class="font-bold text-lg text-primary mb-1">IoT Camera Traps</h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">Capturing real-time visual data and micro-climate metrics directly from the paddy fields.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-5">
+                            <div class="p-3 bg-white rounded-xl shadow-sm border border-accent/10 text-accent"><i data-feather="cloud-drizzle"></i></div>
+                            <div>
+                                <h4 class="font-bold text-lg text-primary mb-1">Weather & API Integration</h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">Aggregating local field data with broader weather APIs for advanced predictive threat modeling.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Research Supervisors -->
+            <div id="supervisors" class="mt-20 mb-24">
+                <div class="text-center mb-12">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background text-primary font-bold text-sm mb-4 border border-primary/20">
+                        <i data-feather="users" class="w-4 h-4 text-secondary"></i>
+                        Academic Guidance
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-primary mb-4">Research Supervisors</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">
+                        With guidance and support from our academic supervisors throughout the research project.
+                    </p>
+                    <div class="w-20 h-1 bg-secondary mx-auto rounded-full mt-6"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <article class="person-card group flex flex-col sm:flex-row items-center sm:items-start gap-6 p-7 md:p-8">
+                        <img
+                            src="./images/Thilini Jayalath.jpeg"
+                            alt="Research supervisor Ms. Thilini Jayalath"
+                            loading="lazy"
+                            class="person-avatar w-32 h-32 shrink-0 rounded-2xl object-cover"
+                        >
+                        <div class="text-center sm:text-left">
+                            <span class="role-pill mb-3">Research Supervisor</span>
+                            <h3 class="font-extrabold text-xl text-primary mb-3">Ms. Thilini Jayalath</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Providing academic guidance and research supervision for The Digital Paddy project.</p>
+                        </div>
+                    </article>
+
+                    <article class="person-card group flex flex-col sm:flex-row items-center sm:items-start gap-6 p-7 md:p-8">
+                        <img
+                            src="./images/Ashvinda Iddamalgoda.jpeg"
+                            alt="Research supervisor Mr. Ashvinda Iddamalgoda"
+                            loading="lazy"
+                            class="person-avatar w-32 h-32 shrink-0 rounded-2xl object-cover"
+                        >
+                        <div class="text-center sm:text-left">
+                            <span class="role-pill mb-3">Research Core Supervisor</span>
+                            <h3 class="font-extrabold text-xl text-primary mb-3">Mr. Ashvinda Iddamalgoda</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Supporting the research team with academic direction and project development.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div id="team" class="mt-20">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-primary mb-4">Research Team</h2>
+                    <div class="w-20 h-1 bg-accent mx-auto rounded-full"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Team Member 1 -->
+                    <div class="person-card group flex flex-col items-center p-8">
+                        <img src="./images/V.G.S.M.Siriwardhana.jpeg" alt="V.G.S.M.Siriwardhana" class="person-avatar w-24 h-24 rounded-full object-cover mb-6">
+                        <h3 class="font-bold text-xl text-primary mb-1">V.G.S.M.Siriwardhana</h3>
+                        <span class="role-pill">Team Member</span>
+                    </div>
+                    
+                    <!-- Team Member 2 -->
+                    <div class="person-card group flex flex-col items-center p-8">
+                        <img src="./images/A.P.N.Satyana.jpeg" alt="A.P.N.Satyana" class="person-avatar w-24 h-24 rounded-full object-cover mb-6">
+                        <h3 class="font-bold text-xl text-primary mb-1">A.P.N.Satyana</h3>
+                        <span class="role-pill">Team Member</span>
+                    </div>
+
+                    <!-- Team Member 3 -->
+                     <div class="person-card group flex flex-col items-center p-8">
+                        <img src="./images/P.D.M.Kumarasinhe.jpeg" alt="Dasun Madusanka" class="person-avatar w-24 h-24 rounded-full object-cover mb-6">
+                        <h3 class="font-bold text-xl text-primary mb-1">Dasun Madusanka</h3>
+                        <span class="role-pill">Team Member</span>
+                    </div>
+                    
+
+                    <!-- Team Member 4 -->
+                     <div class="person-card group flex flex-col items-center p-8">
+                        <img src="./images/J.M.S.U.I.Bandara.jpeg" alt="K. Perera" class="person-avatar w-24 h-24 rounded-full object-cover mb-6">
+                        <h3 class="font-bold text-xl text-primary mb-1">K. Perera</h3>
+                        <span class="role-pill">Team Member</span>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documents section remains the same structure, included for completeness -->
+    <section id="documents" class="relative py-24 px-4" style="background-color: #e8efe5; background-image: linear-gradient(rgba(250, 248, 245, 0.62), rgba(250, 248, 245, 0.82)), url('./images/background1.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-extrabold text-primary mb-6">Project Documents</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Access our complete research findings, architectural plans, and field data. All documents represent the finalized deliverables of The Digital Paddy project.
+                </p>
+                <div class="h-1 w-24 bg-secondary mx-auto mt-8 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-accent/20 hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col h-full group lg:col-span-2 lg:flex-row gap-8 relative overflow-hidden">
+    
+
+                        <div class="absolute inset-0 bg-cover bg-center z-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style="background-image: url('./images/background.jpEg');"></div>
+
+                        <div class="absolute top-0 left-0 w-full h-2 bg-primary group-hover:bg-secondary transition-colors duration-300 z-10"></div>
+                        
+                       
+                        <div class="relative z-10 text-primary group-hover:text-secondary transition-colors duration-300 shrink-0">
+                            <div class="p-5 bg-background/90 backdrop-blur-sm rounded-2xl inline-block border border-accent/10 shadow-sm">
+                                <i data-feather="book-open" class="w-10 h-10"></i>
+                            </div>
+                        </div>
+                        
+                       
+                        <div class="relative z-10 flex-grow flex flex-col">
+                            <h3 class="text-2xl font-bold text-primary mb-3">Common Integrated Report</h3>
+                        
+                            <p class="text-gray-800 font-medium mb-8 flex-grow leading-relaxed text-lg">
+                                Comprehensive documentation of the research, methodology, YOLOv8 model training paradigms, system architecture, and overall findings.
+                            </p>
+                            
+                            <div class="mt-auto flex items-center justify-between border-t border-accent/20 pt-6">
+                               
+                                <div class="text-sm font-semibold text-accent flex flex-col bg-white/60 px-4 py-2 rounded-xl backdrop-blur-sm">
+                                    <span>PDF</span>
+                                </div>
+                                
+                                <button onclick="triggerDownload('./documents/Common_Integrated_Report.pdf')" class="px-6 py-3 rounded-xl bg-primary/10 backdrop-blur-sm text-primary font-bold text-sm hover:bg-secondary hover:text-white transition-all duration-300 flex items-center gap-2 shadow-sm">
+                                    <i data-feather="download" class="w-4 h-4"></i> View & Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="relative bg-white rounded-3xl p-8 shadow-sm border border-accent/20 hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col h-full group overflow-hidden">
+    
+                    <div class="absolute inset-0 bg-cover bg-center z-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style="background-image: url('./images/Paddy yield forecasting component.jpg');"></div>
+
+                    <div class="absolute top-0 left-0 w-full h-2 bg-accent group-hover:bg-secondary transition-colors duration-300 z-10"></div>
+                    
+                    <div class="relative z-10 text-accent group-hover:text-secondary transition-colors duration-300 mb-6">
+                        <div class="p-4 bg-background/90 backdrop-blur-sm rounded-2xl inline-block border border-accent/10">
+                            <i data-feather="share-2" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+            
+                    <div class="relative z-10 flex-grow flex flex-col">
+                        <h3 class="text-xl font-bold text-primary mb-3">Paddy yield forecasting component</h3>
+                        <p class="text-gray-800 mb-8 flex-grow leading-relaxed font-medium">
+                            Data engineering pipelines and algorithmic blueprints detailing the extraction, transformation, and loading (ETL) of real-time soil telemetry and historical RRDI records into an XGBoost predictive modeling engine.
+                        </p>
+                        
+                        <div class="mt-auto flex items-center justify-between border-t border-accent/20 pt-6">
+                            <div class="text-xs font-bold text-accent bg-white/60 px-3 py-1 rounded-full backdrop-blur-sm">PDF</div>
+                            <button onclick="triggerDownload('./documents/Yield Forcasting.pdf')" class="p-3 rounded-lg bg-background/90 backdrop-blur-sm text-primary hover:bg-secondary hover:text-white transition-all duration-300 shadow-sm" title="Download">
+                                <i data-feather="download" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+                <div class="relative bg-white rounded-3xl p-8 shadow-sm border border-accent/20 hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col h-full group overflow-hidden">
+    
+                    <div class="absolute inset-0 bg-cover bg-center z-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style="background-image: url('./images/Irrigation management.jpg');"></div>
+                    
+                    <div class="absolute top-0 left-0 w-full h-2 bg-accent group-hover:bg-secondary transition-colors duration-300 z-10"></div>
+                    
+                    <div class="relative z-10 text-accent group-hover:text-secondary transition-colors duration-300 mb-6">
+                        <div class="p-4 bg-background/90 backdrop-blur-sm rounded-2xl inline-block border border-accent/10">
+                            <i data-feather="share-2" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+            
+                    <div class="relative z-10 flex-grow flex flex-col">
+                        <h3 class="text-xl font-bold text-primary mb-3">Irrigation management component</h3>
+                        <p class="text-gray-800 mb-8 flex-grow leading-relaxed font-medium">
+                                                Hardware-to-cloud topological designs detailing continuous edge sensor networks, fault-tolerant LoRa/Wi-Fi gateways, and stage-aware machine learning schedulers for precision water management.</p>
+                        
+                        <div class="mt-auto flex items-center justify-between border-t border-accent/20 pt-6">
+                            <div class="text-xs font-bold text-accent bg-white/60 px-3 py-1 rounded-full backdrop-blur-sm">PDF</div>
+                            <button onclick="triggerDownload('./documents/Irrigation Management.pdf')" class="p-3 rounded-lg bg-background/90 backdrop-blur-sm text-primary hover:bg-secondary hover:text-white transition-all duration-300 shadow-sm" title="Download">
+                                <i data-feather="download" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="relative bg-white rounded-3xl p-8 shadow-sm border border-accent/20 hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col h-full group overflow-hidden">
+    
+                    <div class="absolute inset-0 bg-cover bg-center z-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style="background-image: url('./images/Disease Detection and Risk Forecasting.jpg');"></div>
+                    
+                    <div class="absolute top-0 left-0 w-full h-2 bg-accent group-hover:bg-secondary transition-colors duration-300 z-10"></div>
+                    
+                    <div class="relative z-10 text-accent group-hover:text-secondary transition-colors duration-300 mb-6">
+                        <div class="p-4 bg-background/90 backdrop-blur-sm rounded-2xl inline-block border border-accent/10">
+                            <i data-feather="share-2" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+            
+                    <div class="relative z-10 flex-grow flex flex-col">
+                        <h3 class="text-xl font-bold text-primary mb-3">Disease detection & risk forecasting component</h3>
+                        <p class="text-gray-800 mb-8 flex-grow leading-relaxed font-medium">       Hybrid neural network architectures and edge-computing blueprints detailing the fusion of ResNet-50 spatial image processing with LSTM temporal forecasting deployed on Raspberry Pi inference nodes.</p>
+                        
+                        <div class="mt-auto flex items-center justify-between border-t border-accent/20 pt-6">
+                            <div class="text-xs font-bold text-accent bg-white/60 px-3 py-1 rounded-full backdrop-blur-sm">PDF</div>
+                            <button onclick="triggerDownload('./documents/Disease Detection and Risk Forecasting.pdf')" class="p-3 rounded-lg bg-background/90 backdrop-blur-sm text-primary hover:bg-secondary hover:text-white transition-all duration-300 shadow-sm" title="Download">
+                                <i data-feather="download" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="relative bg-white rounded-3xl p-8 shadow-sm border border-accent/20 hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col h-full group overflow-hidden">
+    
+                    <div class="absolute inset-0 bg-cover bg-center z-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style="background-image: url('./images/Disease Detection and Risk Forecasting.jpg');"></div>
+                    
+                    <div class="absolute top-0 left-0 w-full h-2 bg-accent group-hover:bg-secondary transition-colors duration-300 z-10"></div>
+                    
+                    <div class="relative z-10 text-accent group-hover:text-secondary transition-colors duration-300 mb-6">
+                        <div class="p-4 bg-background/90 backdrop-blur-sm rounded-2xl inline-block border border-accent/10">
+                            <i data-feather="share-2" class="w-8 h-8"></i>
+                        </div>
+                    </div>
+            
+                    <div class="relative z-10 flex-grow flex flex-col">
+                        <h3 class="text-xl font-bold text-primary mb-3">Pest management component</h3>
+                        <p class="text-gray-800 mb-8 flex-grow leading-relaxed font-medium">
+                                    High-level and low-level architectural blueprints detailing the IoT camera trap network, YOLOv8 computer vision pipelines, and external meteorological API integration for dynamic larval risk scoring.</p>
+                        <div class="mt-auto flex items-center justify-between border-t border-accent/20 pt-6">
+                            <div class="text-xs font-bold text-accent bg-white/60 px-3 py-1 rounded-full backdrop-blur-sm">PDF</div>
+                            <button onclick="triggerDownload('./documents/Pest Management.pdf')" class="p-3 rounded-lg bg-background/90 backdrop-blur-sm text-primary hover:bg-secondary hover:text-white transition-all duration-300 shadow-sm" title="Download">
+                                <i data-feather="download" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+
+                
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-bar border-t-4 border-secondary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+            <div class="grid gap-10 md:grid-cols-3">
+                <div>
+                    <a href="#hero" class="flex items-center gap-3 mb-5">
+                        <img src="https://ui-avatars.com/api/?name=DP&background=66BB6A&color=0e3311&rounded=true&size=128" alt="Digital Paddy Logo" class="w-11 h-11 rounded-full ring-2 ring-white/40">
+                        <span class="font-extrabold text-xl tracking-tight">The Digital Paddy</span>
+                    </a>
+                    <p class="text-white/75 leading-relaxed text-sm max-w-sm">
+                        Advancing sustainable agriculture through edge-deployed artificial intelligence and localized IoT networks.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-secondary mb-5">Explore</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#hero" class="footer-link">Home</a></li>
+                        <li><a href="#context" class="footer-link">Problem &amp; Vision</a></li>
+                        <li><a href="#supervisors" class="footer-link">Research Supervisors</a></li>
+                        <li><a href="#team" class="footer-link">Research Team</a></li>
+                        <li><a href="#documents" class="footer-link">Project Documents</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-secondary mb-5">Built With</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-chip">YOLOv8</span>
+                        <span class="tech-chip">IoT Camera Traps</span>
+                        <span class="tech-chip">Edge AI</span>
+                        <span class="tech-chip">Weather APIs</span>
+                        <span class="tech-chip">XGBoost</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 pt-6 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-sm text-white/60">&copy; 2026 Digital Paddy Research Team. All rights reserved.</p>
+                <a href="#hero" class="nav-link text-sm flex items-center gap-2">Back to top <i data-feather="arrow-up" class="w-4 h-4"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Toast Notification Element -->
+    <div id="toast" class="flex items-center gap-3">
+        <i data-feather="check" class="w-5 h-5 text-black"></i>
+        <span id="toast-message" class="font-medium text-sm"></span>
+    </div>
+
+    <script>
+        feather.replace();
+
+
+        // Mobile menu
+        const menuBtn = document.getElementById("menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const iconOpen = document.getElementById("icon-open");
+        const iconClose = document.getElementById("icon-close");
+
+        function setMenu(open) {
+            mobileMenu.classList.toggle("hidden", !open);
+            iconOpen.classList.toggle("hidden", open);
+            iconClose.classList.toggle("hidden", !open);
+            menuBtn.setAttribute("aria-expanded", String(open));
+        }
+        menuBtn.addEventListener("click", () => setMenu(mobileMenu.classList.contains("hidden")));
+        mobileMenu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setMenu(false)));
+
+        // Header shadow on scroll
+        const navbar = document.getElementById("navbar");
+        window.addEventListener("scroll", () => navbar.classList.toggle("scrolled", window.scrollY > 10), { passive: true });
+
+        let toastTimer;
+
+        function triggerDownload(path) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            const fileName = decodeURI(path.split("/").pop());
+
+            toastMessage.textContent = `Preparing download for: ${fileName}`;
+            toast.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
+
+            // Real download (encodeURI handles spaces in file names)
+            const link = document.createElement("a");
+            link.href = encodeURI(path);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
+    </script>
+</body>
+</html>
